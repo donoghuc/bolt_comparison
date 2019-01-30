@@ -1,0 +1,9 @@
+forge 'http://forge.puppetlabs.com'
+mod 'saz-sudo', '5.0.0'
+mod 'puppetlabs-stdlib', '4.25.1'
+
+mod 'saz-ssh', '5.0.0'
+mod 'puppetlabs-concat', '5.2.0'
+mod 'puppetlabs-translate', '1.2.0'
+
+mod 'puppetlabs-sshkeys_core', '1.0.1'

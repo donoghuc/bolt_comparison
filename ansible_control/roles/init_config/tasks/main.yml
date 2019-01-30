@@ -1,0 +1,69 @@
+###
+# install and configure fail2ban
+##
+- name: Ensure rsyslog installed (fail2ban dependency)
+  apt:
+    name: rsyslog
+    state: present
+    update_cache: yes
+
+- name: Ensure rsyslog is running (fail2ban dependency)
+  service:
+    name: rsyslog
+    state: started
+
+- name: Ensure fail2ban installed
+  apt:
+    name: fail2ban
+    state: present
+    update_cache: yes
+
+- name: Ensure fail2ban is running
+  service:
+    name: fail2ban
+    state: started
+
+- name: Create a non-root group
+  group:
+    name: "{{ deploy_group }}"
+    state: present
+
+- name: Create non-root user
+  user:
+    name: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    shell: "/bin/bash"
+    state: present
+
+- name: Add non-root group to sudo privileges
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: "^{{ deploy_group }}"
+    line: "%{{ deploy_group }} ALL=(ALL) NOPASSWD: ALL"
+    validate: visudo -cf %s
+
+- name: Add authorized_key to non-root user
+  authorized_key:
+    user: "{{ deploy_user }}"
+    state: present
+    key: "{{ lookup('file', ssh_dir + ssh_key_name) }}"
+
+- name: Disable root SSH logins
+  replace:
+    destfile: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin yes"
+    replace: "PermitRootLogin no"
+    backup: no
+
+- name: Disable SSH logins by password
+  replace:
+    destfile: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication yes"
+    replace: "PasswordAuthentication no"
+    backup: no
+
+- name: Restart SSH service
+  service:
+    name: ssh
+    state: restarted

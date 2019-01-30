@@ -1,0 +1,4 @@
+deploy_group: deployers
+deploy_user: deployer
+ssh_dir: "/home/casadilla/workingdir/bolt_hack/ssh/"
+ssh_key_name: "deploy.pub"

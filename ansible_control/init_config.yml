@@ -1,0 +1,9 @@
+###
+# Locks down the server and set up a non-root user
+###
+- name: apply initial config to server
+  hosts: ansible_target
+  user: vagrant
+  become: yes
+  roles:
+    - init_config

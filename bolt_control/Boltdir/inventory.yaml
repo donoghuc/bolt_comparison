@@ -1,0 +1,11 @@
+---
+nodes:
+  - name: localhost
+    alias: bolt_target
+    config:
+      transport: ssh
+      ssh:
+        user: vagrant
+        host-key-check: false
+        private-key: /home/casadilla/workingdir/bolt_comparison/.vagrant/machines/bolt_target/virtualbox/private_key
+        port: 20022
