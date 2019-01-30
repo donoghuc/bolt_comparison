@@ -1,0 +1,61 @@
+---
+params:
+  nodes:
+    type: "TargetSpec"
+
+steps:
+  - name: prep
+    function: apply_prep
+    target: $nodes
+  - name: init
+    target: $nodes
+    apply:
+      - resource: package
+        title: rsyslog
+        parameters:
+          - ensure: present
+      - resource: service
+        title: rsyslog
+        parameters: 
+          - ensure: running
+          - enable: true
+          - require: Package['rsyslog']
+      - resource: package
+        title: fail2ban
+        parameters:
+          - ensure: present
+      - resource: service
+        title: fail2ban
+        parameters: 
+          - ensure: running
+          - enable: true
+          - require: Package['fail2ban']
+      - resource: group
+        title: "${lookup('deploy_group')}"
+        parameters:
+          - ensure: present
+      - resource: user
+        title: "${lookup('deploy_group')}"
+        parameters:
+          - ensure: present
+          - groups: "${lookup('deploy_group')}"
+          - managehome: true
+          - home: "/home/${lookup('deploy_user')}"
+          - shell: /bin/bash
+
+      - class: sudo
+        title: sudo
+        parameters:
+          - purge: false
+          - config_file_replace: false
+      - class: sudo::conf
+        title: "${lookup('deploy_group')}"
+        parameters:
+          - content: "%${lookup('deploy_group')} ALL=(ALL) NOPASSWD: ALL"
+      - resource: ssh_authorized_key
+        title: ${lookup('deploy_user')_lookup('deploy_user')}"
+        parameters:
+          - ensure: present
+          - user: "${lookup('deploy_user')}"
+          - type: ssh-rsa
+          - key: "${lookup('deploy_key')}"
